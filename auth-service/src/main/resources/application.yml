@@ -1,0 +1,23 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: shop
+    password: shop123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-this-to-a-long-random-string-of-at-least-32-chars}
+    access-token-minutes: 15
+    refresh-token-days: 7
+  security:
+    max-failed-attempts: 5
+    lock-minutes: 15
