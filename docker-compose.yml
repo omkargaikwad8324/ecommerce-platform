@@ -11,12 +11,22 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./infra/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shop -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis:
     image: redis:7
     container_name: shop-redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   rabbitmq:
     image: rabbitmq:3.13-management
@@ -27,6 +37,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
   mailpit:
     image: axllent/mailpit
@@ -34,6 +49,93 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+
+  auth-service:
+    build:
+      context: .
+      args:
+        MODULE: auth-service
+    environment:
+      DB_HOST: postgres
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 512m
+    restart: on-failure
+
+  product-service:
+    build:
+      context: .
+      args:
+        MODULE: product-service
+    environment:
+      DB_HOST: postgres
+      REDIS_HOST: redis
+      INTERNAL_KEY: ${INTERNAL_KEY:?set INTERNAL_KEY in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 512m
+    restart: on-failure
+
+  order-service:
+    build:
+      context: .
+      args:
+        MODULE: order-service
+    environment:
+      DB_HOST: postgres
+      RABBIT_HOST: rabbitmq
+      PRODUCT_SERVICE_URL: http://product-service:8082
+      INTERNAL_KEY: ${INTERNAL_KEY:?set INTERNAL_KEY in .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    mem_limit: 512m
+    restart: on-failure
+
+  notification-service:
+    build:
+      context: .
+      args:
+        MODULE: notification-service
+    environment:
+      DB_HOST: postgres
+      RABBIT_HOST: rabbitmq
+      MAIL_HOST: mailpit
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    mem_limit: 512m
+    restart: on-failure
+
+  gateway:
+    build:
+      context: .
+      args:
+        MODULE: gateway
+    environment:
+      REDIS_HOST: redis
+      AUTH_URL: http://auth-service:8081
+      PRODUCT_URL: http://product-service:8082
+      ORDER_URL: http://order-service:8083
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+    ports:
+      - "8080:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+    mem_limit: 512m
+    restart: on-failure
 
 volumes:
   pgdata:

@@ -6,7 +6,7 @@ spring:
     name: gateway
   data:
     redis:
-      host: 127.0.0.1
+      host: ${REDIS_HOST:localhost}
       port: 6379
       timeout: 2s
       connect-timeout: 2s
@@ -14,7 +14,7 @@ spring:
     gateway:
       routes:
         - id: auth-service
-          uri: http://127.0.0.1:8081
+          uri: ${AUTH_URL:http://localhost:8081}
           predicates:
             - Path=/api/auth/**, /api/users/**, /api/admin/**
           filters:
@@ -26,7 +26,7 @@ spring:
                 key-resolver: "#{@rateLimitKeyResolver}"
 
         - id: product-service
-          uri: http://127.0.0.1:8082
+          uri: ${PRODUCT_URL:http://localhost:8082}
           predicates:
             - Path=/api/products/**
           filters:
@@ -38,7 +38,7 @@ spring:
                 key-resolver: "#{@rateLimitKeyResolver}"
 
         - id: order-service
-          uri: http://127.0.0.1:8083
+          uri: ${ORDER_URL:http://localhost:8083}
           predicates:
             - Path=/api/orders/**
           filters:

@@ -5,7 +5,7 @@ spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/order_db
+    url: jdbc:postgresql://${DB_HOST:127.0.0.1}:5432/product_db
     username: shop
     password: shop123
   jpa:
@@ -15,7 +15,7 @@ spring:
     properties:
       hibernate.default_batch_fetch_size: 20
   rabbitmq:
-    host: 127.0.0.1
+    host: ${RABBIT_HOST:127.0.0.1}
     port: 5672
     username: shop
     password: shop123
@@ -24,4 +24,4 @@ spring:
 app:
   internal-key: ${INTERNAL_KEY:dev-internal-key-change-me}
   product-service:
-    url: http://127.0.0.1:8082
+    url: ${PRODUCT_SERVICE_URL:http://127.0.0.1:8082}
