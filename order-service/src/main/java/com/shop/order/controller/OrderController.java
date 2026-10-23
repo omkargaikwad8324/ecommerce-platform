@@ -27,11 +27,13 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponse> create(
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @RequestHeader(value = "X-User-Email", required = false) String email,
             @Valid @RequestBody CreateOrderRequest request, Authentication auth) {
         if (idempotencyKey != null && (idempotencyKey.isBlank() || idempotencyKey.length() > 100)) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Idempotency-Key must be 1-100 characters");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(userId(auth), idempotencyKey, request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.create(userId(auth), email, idempotencyKey, request));
     }
 
     @GetMapping

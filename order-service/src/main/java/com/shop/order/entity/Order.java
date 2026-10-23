@@ -25,6 +25,8 @@ public class Order {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    private String userEmail;
+
     @Column(name = "idempotency_key", length = 100)
     private String idempotencyKey;
 

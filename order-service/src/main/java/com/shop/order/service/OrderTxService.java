@@ -31,10 +31,12 @@ public class OrderTxService {
     }
 
     @Transactional
-    public OrderResponse save(Long userId, String key, List<Reserved> lines) {
+    public OrderResponse save(Long userId, String email, String key, List<Reserved> lines) {
         Order order = new Order();
         order.setUserId(userId);
+        order.setUserEmail(email);
         order.setIdempotencyKey(key);
+        // ... rest of the method unchanged
 
         BigDecimal total = BigDecimal.ZERO;
         for (Reserved r : lines) {
@@ -106,7 +108,7 @@ public class OrderTxService {
         List<OrderItemResponse> items = o.getItems().stream()
                 .map(i -> new OrderItemResponse(i.getProductId(), i.getProductName(), i.getUnitPrice(), i.getQuantity()))
                 .toList();
-        return new OrderResponse(o.getId(), o.getUserId(), o.getStatus().name(),
+             return new OrderResponse(o.getId(), o.getUserId(), o.getUserEmail(), o.getStatus().name(),
                 o.getTotalAmount(), o.getCreatedAt(), items);
     }
 }

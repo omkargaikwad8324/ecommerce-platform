@@ -4,6 +4,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-public record OrderResponse(Long id, Long userId, String status, BigDecimal totalAmount,
+public record OrderResponse(Long id, Long userId, String userEmail, String status, BigDecimal totalAmount,
                             Instant createdAt, List<OrderItemResponse> items) {
 }
