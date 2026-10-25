@@ -91,6 +91,7 @@ public class ProductService {
             }
             throw new ApiException(HttpStatus.CONFLICT, "Insufficient stock");
         }
+        log.info("Reserved {} x product {}", quantity, id);
         return toResponse(repo.findById(id).orElseThrow());
     }
 

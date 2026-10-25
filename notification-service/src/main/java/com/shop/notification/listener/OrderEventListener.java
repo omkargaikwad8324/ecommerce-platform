@@ -5,6 +5,7 @@ import com.shop.notification.dto.OrderEvent;
 import com.shop.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,14 @@ public class OrderEventListener {
 
     @RabbitListener(queues = RabbitConfig.QUEUE)
     public void onOrderEvent(OrderEvent event) {
-        log.info("Received {} for order {}", event.type(), event.orderId());
-        service.process(event);
+        if (event.requestId() != null) {
+            MDC.put("rid", event.requestId());
+        }
+        try {
+            log.info("Received {} for order {}", event.type(), event.orderId());
+            service.process(event);
+        } finally {
+            MDC.remove("rid");
+        }
     }
 }

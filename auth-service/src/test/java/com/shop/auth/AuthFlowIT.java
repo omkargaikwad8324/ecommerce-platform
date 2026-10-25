@@ -21,8 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -145,5 +144,12 @@ class AuthFlowIT {
     @Test
     void refresh_withGarbageToken_returns401() throws Exception {
         refresh("not-a-real-token").andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void everyResponseCarriesTheRequestId_evenWhenUnauthorized() throws Exception {
+        mvc.perform(get("/api/users/me").header("X-Request-Id", "trace-12345678"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(header().string("X-Request-Id", "trace-12345678"));
     }
 }

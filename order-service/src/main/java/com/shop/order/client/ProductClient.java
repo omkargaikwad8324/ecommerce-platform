@@ -2,7 +2,9 @@ package com.shop.order.client;
 
 import com.shop.order.exception.ApiException;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -31,11 +33,15 @@ public class ProductClient {
                 .build();
     }
 
-    /** Atomically decrements stock and returns the product (name, price) as it is right now. */
+    /**
+     * Atomically decrements stock and returns the product (name, price) as it is right now.
+     */
     public ProductInfo reserve(Long productId, int quantity) {
         try {
             return client.post()
                     .uri("/internal/products/{id}/reserve", productId)
+                    .headers(ProductClient::addRequestId)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("quantity", quantity))
                     .retrieve()
@@ -55,17 +61,28 @@ public class ProductClient {
         }
     }
 
-    /** Compensation call. Never throws: a failed release is logged for manual repair. */
+    /**
+     * Compensation call. Never throws: a failed release is logged for manual repair.
+     */
     public void release(Long productId, int quantity) {
         try {
             client.post()
                     .uri("/internal/products/{id}/release", productId)
+                    .headers(ProductClient::addRequestId)
+                    .contentType(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("quantity", quantity))
                     .retrieve()
                     .toBodilessEntity();
         } catch (RestClientException e) {
             log.error("STOCK LEAK: failed to release {} x product {}: {}", quantity, productId, e.getMessage());
+        }
+    }
+
+    private static void addRequestId(HttpHeaders headers) {
+        String rid = MDC.get("rid");
+        if (rid != null) {
+            headers.set("X-Request-Id", rid);
         }
     }
 }

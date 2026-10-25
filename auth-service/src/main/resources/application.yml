@@ -21,3 +21,17 @@ app:
   security:
     max-failed-attempts: 5
     lock-minutes: 15
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [rid=%X{rid:-}]"

@@ -25,3 +25,17 @@ app:
   internal-key: ${INTERNAL_KEY:dev-internal-key-change-me}
   product-service:
     url: ${PRODUCT_SERVICE_URL:http://127.0.0.1:8082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [rid=%X{rid:-}]"

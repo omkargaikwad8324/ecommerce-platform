@@ -25,8 +25,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/error", "/actuator/health/**").permitAll()                        .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .addFilterBefore(gatewayHeaderFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

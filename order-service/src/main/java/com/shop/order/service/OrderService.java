@@ -6,9 +6,11 @@ import com.shop.order.dto.*;
 import com.shop.order.entity.OrderStatus;
 import com.shop.order.messaging.OrderEventPublisher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 
 import org.springframework.data.domain.Pageable;
 import com.shop.order.entity.OrderStatus;
@@ -18,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -57,6 +60,8 @@ public class OrderService {
             releaseAll(reserved);
             throw ex;
         }
+        // in create(), just before events.publish(...)
+        log.info("Order {} created for user {}, total {}", saved.id(), userId, saved.totalAmount());
 
         events.publish("order.created", OrderEvent.of("ORDER_CREATED", saved));
         return saved;
@@ -66,6 +71,8 @@ public class OrderService {
         List<Reserved> lines = tx.cancel(id, userId, admin);
         releaseAll(lines);
         OrderResponse resp = tx.get(id, userId, admin);
+        // in cancel(), just before events.publish(...)
+        log.info("Order {} cancelled", id);
         events.publish("order.cancelled", OrderEvent.of("ORDER_CANCELLED", resp));
         return resp;
     }
