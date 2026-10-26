@@ -22,6 +22,24 @@ flowchart LR
   MQ --> N[notification-service]
   N --> NDB[(notification_db)]
   N --> M[Mailpit SMTP]
+  
+  ## Screenshots
+
+| Services up and healthy | Order flow through the gateway |
+| --- | --- |
+| ![docker compose ps](docs/screenshots/compose-healthy.png) | ![order flow](docs/screenshots/order-flow.png) |
+
+| Order emails (Mailpit) | RabbitMQ queues and dead-letter queue |
+| --- | --- |
+| ![mailpit](docs/screenshots/mailpit-emails.png) | ![rabbitmq](docs/screenshots/rabbitmq-queues.png) |
+
+**One request id across four services**
+
+![trace logs](docs/screenshots/trace-logs.png)
+
+**CI: tests plus a Docker build for every service**
+
+![ci](docs/screenshots/ci-green.png)
 ```
 
 Only the gateway is published to the host. All other services are reachable only inside the Docker network.
