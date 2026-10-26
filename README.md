@@ -38,7 +38,7 @@ Only the gateway is published to the host. All other services are reachable only
 
 **One request id across four services**
 
-![trace logs](docs/screenshots/trace-logs.png)
+![trace logs](docs/screenshots/trace-logs3.png)
 
 **CI: tests plus a Docker build for every service**
 
