@@ -28,21 +28,29 @@ Only the gateway is published to the host. All other services are reachable only
 
 ## Screenshots
 
-| Services up and healthy | Order flow through the gateway |
+### Running stack (Docker Compose)
+
+| Services healthy | Services healthy (view 2) | Services healthy (view 3) |
+| --- | --- | --- |
+| <img src="docs/screenshots/compose-healthy.png" alt="docker compose ps" width="300"> | <img src="docs/screenshots/compose-healthy1.png" alt="docker compose ps, second view" width="300"> | <img src="docs/screenshots/compose-healthy2.png" alt="docker compose ps, third view" width="300"> |
+
+### Order flow through the gateway
+
+<img src="docs/screenshots/order-flow.png" alt="Order flow through the gateway" width="800">
+
+### Order emails (Mailpit)
+
+<img src="docs/screenshots/mailpit-emails.png" alt="Mailpit inbox with order emails" width="800">
+
+### RabbitMQ queues and dead-letter queue
+
+| Queues | Queues (view 2) |
 | --- | --- |
-| ![docker compose ps](docs/screenshots/compose-healthy.png) | ![order flow](docs/screenshots/order-flow.png) |
+| <img src="docs/screenshots/rabbitmq-queues.png" alt="RabbitMQ queues" width="400"> | <img src="docs/screenshots/rabbitmq-queues1.png" alt="RabbitMQ queues, second view" width="400"> |
 
-| Order emails (Mailpit) | RabbitMQ queues and dead-letter queue |
-| --- | --- |
-| ![mailpit](docs/screenshots/mailpit-emails.png) | ![rabbitmq](docs/screenshots/rabbitmq-queues.png) |
+### CI: tests plus a Docker build for every service
 
-**One request id across four services**
-
-![trace logs](docs/screenshots/trace-logs3.png)
-
-**CI: tests plus a Docker build for every service**
-
-![ci](docs/screenshots/ci-green.png)
+<img src="docs/screenshots/ci-green.png" alt="GitHub Actions pipeline" width="800">
 
 ## Services
 
